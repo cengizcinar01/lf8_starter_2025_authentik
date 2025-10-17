@@ -1,4 +1,5 @@
 package de.szut.lf8_starter.security;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -60,6 +61,4 @@ public class AuthentikSecurityConfig {
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }
-
-
 }
