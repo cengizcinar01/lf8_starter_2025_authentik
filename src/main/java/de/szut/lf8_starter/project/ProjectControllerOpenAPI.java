@@ -1,6 +1,7 @@
 package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.exceptionHandling.ErrorDetails;
+import de.szut.lf8_starter.project.dto.AddEmployeeToProjectDto;
 import de.szut.lf8_starter.project.dto.ProjectCreateDto;
 import de.szut.lf8_starter.project.dto.ProjectGetDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -68,4 +69,15 @@ public interface ProjectControllerOpenAPI {
     })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteProject(@PathVariable Long id);
+
+    @Operation(summary = "Adds an employee to a project team.", description = "Assigns an existing employee to an existing project.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee added successfully", content = @Content(schema = @Schema(implementation = ProjectGetDto.class))),
+            @ApiResponse(responseCode = "401", description = "Not authorized"),
+            @ApiResponse(responseCode = "404", description = "Project or employee not found"),
+            @ApiResponse(responseCode = "409", description = "Conflict, e.g., employee is already in the team or scheduled in this timeframe")
+    })
+    ResponseEntity<ProjectGetDto> addEmployeeToProject(@PathVariable Long projectId,
+                                                       @Valid @RequestBody AddEmployeeToProjectDto dto,
+                                                       @RequestHeader("Authorization") String bearerToken);
 }
