@@ -124,4 +124,25 @@ public class ProjectService {
             throw e;
         }
     }
+
+    /**
+     * Adds an employee to a project.
+     * Validates the existence of the project and the employee.
+     *
+     * @param projectId   the ID of the project.
+     * @param employeeId  the ID of the employee to add.
+     * @param bearerToken the authorization token for external validation.
+     * @return the updated project DTO.
+     */
+    public ProjectGetDto addEmployeeToProject(Long projectId, Long employeeId, String bearerToken) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
+        validateEmployeeExists(employeeId, bearerToken);
+        if (project.getEmployeeIds().contains(employeeId)) {
+            return projectMapper.mapEntityToGetDto(project);
+        }
+        project.getEmployeeIds().add(employeeId);
+        ProjectEntity updatedProject = projectRepository.save(project);
+        return projectMapper.mapEntityToGetDto(updatedProject);
+    }
 }
