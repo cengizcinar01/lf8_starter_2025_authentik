@@ -11,7 +11,12 @@ public class PostgresContextInitializer implements ApplicationContextInitializer
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14"))
             .withDatabaseName("test_db")
             .withUsername("test-db-user")
-            .withPassword("test-db-password");
+            .withPassword("test-db-password")
+            .withReuse(true);
+
+    static {
+        System.setProperty("testcontainers.ryuk.disabled", "true");
+    }
 
     @Override
     public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
