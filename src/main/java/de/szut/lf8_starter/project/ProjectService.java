@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -110,15 +111,17 @@ public class ProjectService {
      */
     private void validateEmployeeExists(Long employeeId, String bearerToken) {
         final String url = "https://employee-api.szut.dev/employees/{id}";
-
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", bearerToken);
-
         HttpEntity<String> entity = new HttpEntity<>(headers);
+
         try {
             restTemplate.exchange(url, HttpMethod.GET, entity, Void.class, employeeId);
-        } catch (HttpClientErrorException.NotFound e) {
-            throw new ResourceNotFoundException("Employee with ID " + employeeId + " not found.");
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+                throw new ResourceNotFoundException("Employee with ID " + employeeId + " not found.");
+            }
+            throw e;
         }
     }
 }
