@@ -11,13 +11,13 @@ import java.util.Date;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
     /**
      * Handles exceptions when a requested resource is not found.
      * Returns a 404 Not Found status.
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException ex,
+                                                                        WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
@@ -29,19 +29,31 @@ public class GlobalExceptionHandler {
      * (Dies ist die exakte Logik aus dem 'store'-Projekt)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDetails> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ErrorDetails> handleValidationExceptions(MethodArgumentNotValidException ex,
+                                                                   WebRequest request) {
         String errorMessage = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         ErrorDetails errorDetails = new ErrorDetails(new Date(), errorMessage, request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     /**
-     * A catch-all handler for any other unhandled exceptions.
-     * Returns a 500 Internal Server Error status.
+     * Handles exceptions for scheduling conflicts.
+     *
+     * @param ex      the exception
+     * @param request the web request
+     * @return a ResponseEntity with 409 Conflict status.
      */
+    @ExceptionHandler(EmployeeNotAvailableException.class)
+    public ResponseEntity<ErrorDetails> handleEmployeeNotAvailableException(EmployeeNotAvailableException ex,
+                                                                            WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleAllOtherExceptions(Exception ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), "An unexpected error occurred", request.getDescription(false));
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "An unexpected internal error occurred",
+                request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
