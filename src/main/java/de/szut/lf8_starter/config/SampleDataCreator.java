@@ -5,9 +5,7 @@ import de.szut.lf8_starter.hello.HelloEntity;
 import de.szut.lf8_starter.hello.HelloRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 @Component
 public class SampleDataCreator implements ApplicationRunner {
@@ -24,10 +22,4 @@ public class SampleDataCreator implements ApplicationRunner {
         repository.save(new HelloEntity("FooBar"));
 
     }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
 }
