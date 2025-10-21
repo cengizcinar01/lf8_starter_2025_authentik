@@ -5,7 +5,7 @@ Dieses Projekt implementiert ein Backend für eine Projektverwaltungssoftware al
 Der Service bietet eine REST-Schnittstelle zur Verwaltung von Projekten und deren zugeordneten Mitarbeitern. Die Authentifizierung erfolgt über einen zentralen Authentik-Service mittels JWT.
 
 ## Technologie-Stack
-- Java 17 & Spring Boot 3.3
+- Java 21 & Spring Boot 3.3
 - PostgreSQL
 - REST-API mit JSON
 - JWT-Authentifizierung (via Authentik)
