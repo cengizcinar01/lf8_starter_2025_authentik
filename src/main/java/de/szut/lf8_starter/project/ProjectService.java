@@ -2,6 +2,7 @@ package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.exceptionHandling.EmployeeNotAvailableException;
 import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
+import de.szut.lf8_starter.project.dto.GetEmployeesOfProjectDto;
 import de.szut.lf8_starter.project.dto.ProjectCreateDto;
 import de.szut.lf8_starter.project.dto.ProjectGetDto;
 import lombok.RequiredArgsConstructor;
@@ -191,5 +192,17 @@ public class ProjectService {
             throw new ResourceNotFoundException("Employee with ID " + employeeId + " is not assigned to project with ID " + projectId + ".");
         }
         projectRepository.save(project);
+    }
+
+    public GetEmployeesOfProjectDto getEmployeesOfProject(Long projectId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
+        
+        GetEmployeesOfProjectDto dto = new GetEmployeesOfProjectDto();
+        dto.setProjectId(project.getId());
+        dto.setProjectName(project.getName());
+        dto.setEmployeeIds(project.getEmployeeIds());
+
+        return dto;
     }
 }

@@ -2,6 +2,7 @@ package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.exceptionHandling.ErrorDetails;
 import de.szut.lf8_starter.project.dto.AddEmployeeToProjectDto;
+import de.szut.lf8_starter.project.dto.GetEmployeesOfProjectDto;
 import de.szut.lf8_starter.project.dto.ProjectCreateDto;
 import de.szut.lf8_starter.project.dto.ProjectGetDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,4 +90,12 @@ public interface ProjectControllerOpenAPI {
     })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void removeEmployeeFromProject(@PathVariable Long projectId, @PathVariable Long employeeId);
+
+    @Operation(summary = "Gets all employees of a project.", description = "Retrieves a list of all employee IDs assigned to a specific project.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee list retrieved successfully", content = @Content(schema = @Schema(implementation = GetEmployeesOfProjectDto.class))),
+            @ApiResponse(responseCode = "401", description = "Not authorized"),
+            @ApiResponse(responseCode = "404", description = "Project not found")
+    })
+    ResponseEntity<GetEmployeesOfProjectDto> getEmployeesOfProject(@PathVariable Long projectId);
 }
