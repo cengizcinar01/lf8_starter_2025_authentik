@@ -31,11 +31,6 @@ public class ProjectController implements ProjectControllerOpenAPI {
     }
 
     @Override
-    public ResponseEntity<ProjectGetDto> createProject(ProjectCreateDto createDto) {
-        return null;
-    }
-
-    @Override
     @GetMapping
     public ResponseEntity<List<ProjectGetDto>> getAllProjects() {
         List<ProjectGetDto> projects = projectService.readAll();
@@ -47,11 +42,6 @@ public class ProjectController implements ProjectControllerOpenAPI {
     public ResponseEntity<ProjectGetDto> getProjectById(@PathVariable Long id) {
         ProjectGetDto project = projectService.readById(id);
         return ResponseEntity.ok(project);
-    }
-
-    @Override
-    public ResponseEntity<ProjectGetDto> updateProject(Long id, ProjectCreateDto updateDto) {
-        return null;
     }
 
     @Override
