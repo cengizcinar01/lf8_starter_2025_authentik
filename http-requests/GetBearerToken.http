@@ -18,5 +18,3 @@ scope = openid
 > {%
     client.global.set("bearerToken", response.body.access_token);
 %}
-
-###

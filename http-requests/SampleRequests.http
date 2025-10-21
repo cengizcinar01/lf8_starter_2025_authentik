@@ -1,0 +1,21 @@
+Authorization: Bearer {{bearerToken}}
+
+###
+GET localhost:8080/welcome
+
+###
+GET localhost:8080/roles
+Authorization: Bearer {{bearerToken}}
+
+###
+GET localhost:8080/hello
+Authorization: Bearer {{bearerToken}}
+
+###
+POST localhost:8080/hello
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "message": "test"
+}
