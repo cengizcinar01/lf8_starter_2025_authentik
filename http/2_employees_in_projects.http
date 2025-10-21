@@ -1,0 +1,49 @@
+@bearerToken = {{bearerToken}}
+
+### 1. Füge Mitarbeiter 3 zu Projekt 1 hinzu
+POST http://localhost:8080/projects/1/employees
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "employeeId": 3
+}
+
+### 2. Entferne Mitarbeiter 2 aus Projekt 1
+DELETE http://localhost:8080/projects/1/employees/2
+Authorization: Bearer {{bearerToken}}
+
+### 3. (FEHLER) Füge nicht-existierenden Mitarbeiter zu Projekt 1 hinzu
+POST http://localhost:8080/projects/1/employees
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "employeeId": 99999
+}
+
+### 4. (FEHLER) Entferne Mitarbeiter, der nicht im Team ist, aus Projekt 1
+DELETE http://localhost:8080/projects/1/employees/888
+Authorization: Bearer {{bearerToken}}
+
+### 5. (SETUP FÜR KONFLIKT) Lege ein überschneidendes Projekt an (wird ID 3, wenn 2 gelöscht wurde)
+POST http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Konflikt-Projekt",
+  "responsibleEmployeeId": 4,
+  "startDate": "2025-11-15",
+  "endDate": "2025-12-15"
+}
+
+### 6. (FEHLER) Versuche, Mitarbeiter 1 (aus Projekt 1) zum Konflikt-Projekt hinzuzufügen
+# ANNAHME: Das Konflikt-Projekt hat die ID 3
+POST http://localhost:8080/projects/3/employees
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "employeeId": 1
+}
