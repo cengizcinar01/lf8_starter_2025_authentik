@@ -1,6 +1,7 @@
 package de.szut.lf8_starter.project;
 
 import de.szut.lf8_starter.project.dto.AddEmployeeToProjectDto;
+import de.szut.lf8_starter.project.dto.GetEmployeesOfProjectDto;
 import de.szut.lf8_starter.project.dto.ProjectCreateDto;
 import de.szut.lf8_starter.project.dto.ProjectGetDto;
 import jakarta.validation.Valid;
@@ -77,5 +78,12 @@ public class ProjectController implements ProjectControllerOpenAPI {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeEmployeeFromProject(@PathVariable Long projectId, @PathVariable Long employeeId) {
         projectService.removeEmployeeFromProject(projectId, employeeId);
+    }
+
+    @Override
+    @GetMapping("/{projectId}/employees")
+    public ResponseEntity<GetEmployeesOfProjectDto> getEmployeesOfProject(@PathVariable Long projectId) {
+        GetEmployeesOfProjectDto employeesDto = projectService.getEmployeesOfProject(projectId);
+        return ResponseEntity.ok(employeesDto);
     }
 }
