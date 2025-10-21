@@ -41,10 +41,7 @@ public class ProjectService {
         ProjectEntity savedEntity = projectRepository.save(newEntity);
         return projectMapper.mapEntityToGetDto(savedEntity);
     }
-
-    private void validateEmployeeExists(Long aLong) {
-    }
-
+    
     /**
      * Retrieves all projects.
      *
