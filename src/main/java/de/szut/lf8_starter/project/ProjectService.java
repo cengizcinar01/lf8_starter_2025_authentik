@@ -4,7 +4,12 @@ import de.szut.lf8_starter.exceptionHandling.ResourceNotFoundException;
 import de.szut.lf8_starter.project.dto.ProjectCreateDto;
 import de.szut.lf8_starter.project.dto.ProjectGetDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +23,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
+    private final RestTemplate restTemplate;
 
     /**
      * Creates a new project after validating the provided employee IDs.
@@ -25,10 +31,17 @@ public class ProjectService {
      * @param createDto DTO containing the project data.
      * @return the created project as a DTO.
      */
-    public ProjectGetDto create(ProjectCreateDto createDto) {
+    public ProjectGetDto create(ProjectCreateDto createDto, String bearerToken) {
+        validateEmployeeExists(createDto.getResponsibleEmployeeId(), bearerToken);
+        if (createDto.getEmployeeIds() != null) {
+            createDto.getEmployeeIds().forEach(employeeId -> validateEmployeeExists(employeeId, bearerToken));
+        }
         ProjectEntity newEntity = projectMapper.mapCreateDtoToEntity(createDto);
         ProjectEntity savedEntity = projectRepository.save(newEntity);
         return projectMapper.mapEntityToGetDto(savedEntity);
+    }
+
+    private void validateEmployeeExists(Long aLong) {
     }
 
     /**
@@ -64,7 +77,11 @@ public class ProjectService {
      * @return the updated project DTO.
      * @throws ResourceNotFoundException if the project to update is not found.
      */
-    public ProjectGetDto update(Long id, ProjectCreateDto updateDto) {
+    public ProjectGetDto update(Long id, ProjectCreateDto updateDto, String bearerToken) {
+        validateEmployeeExists(updateDto.getResponsibleEmployeeId(), bearerToken);
+        if (updateDto.getEmployeeIds() != null) {
+            updateDto.getEmployeeIds().forEach(employeeId -> validateEmployeeExists(employeeId, bearerToken));
+        }
         ProjectEntity existingEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project with id " + id + " not found"));
         ProjectEntity updatedEntity = projectMapper.mapUpdateDtoToEntity(existingEntity, updateDto);
@@ -83,5 +100,25 @@ public class ProjectService {
             throw new ResourceNotFoundException("Project with id " + id + " not found");
         }
         projectRepository.deleteById(id);
+    }
+
+    /**
+     * Validates if an employee with the given ID exists by calling the external employee service.
+     * Throws a ResourceNotFoundException if the employee does not exist.
+     *
+     * @param employeeId the ID of the employee to check.
+     */
+    private void validateEmployeeExists(Long employeeId, String bearerToken) {
+        final String url = "https://employee-api.szut.dev/employees/{id}";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", bearerToken);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        try {
+            restTemplate.exchange(url, HttpMethod.GET, entity, Void.class, employeeId);
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new ResourceNotFoundException("Employee with ID " + employeeId + " not found.");
+        }
     }
 }
