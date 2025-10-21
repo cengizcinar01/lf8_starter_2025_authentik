@@ -6,10 +6,12 @@ import de.szut.lf8_starter.project.dto.ProjectGetDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
+/**
+ * Service class for handling project-related business logic.
+ */
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
@@ -17,63 +19,69 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
 
-    public ProjectGetDto createProject(ProjectCreateDto createDto) {
-        if (createDto.getEmployeeIds() == null) {
-            createDto.setEmployeeIds(new HashSet<>());
-        }
-
-        if (createDto.getStatus() == null) {
-            createDto.setStatus(ProjectStatus.PLANNED);
-        }
-
-        ProjectEntity entity = projectMapper.mapCreateDtoToEntity(createDto);
-
-        ProjectEntity savedEntity = projectRepository.save(entity);
-
+    /**
+     * Creates a new project after validating the provided employee IDs.
+     *
+     * @param createDto DTO containing the project data.
+     * @return the created project as a DTO.
+     */
+    public ProjectGetDto create(ProjectCreateDto createDto) {
+        ProjectEntity newEntity = projectMapper.mapCreateDtoToEntity(createDto);
+        ProjectEntity savedEntity = projectRepository.save(newEntity);
         return projectMapper.mapEntityToGetDto(savedEntity);
     }
 
-    public List<ProjectGetDto> getAllProjects() {
-        List<ProjectEntity> entities = projectRepository.findAll();
-        return entities.stream()
+    /**
+     * Retrieves all projects.
+     *
+     * @return a list of all projects.
+     */
+    public List<ProjectGetDto> readAll() {
+        return projectRepository.findAll()
+                .stream()
                 .map(projectMapper::mapEntityToGetDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    public ProjectGetDto getProjectById(Long id) {
-        Optional<ProjectEntity> entity = projectRepository.findById(id);
-
-        if (entity.isEmpty()) {
-            throw new ResourceNotFoundException("Project with id " + id + " not found");
-        }
-
-        return projectMapper.mapEntityToGetDto(entity.get());
+    /**
+     * Retrieves a single project by its ID.
+     *
+     * @param id the ID of the project.
+     * @return the project DTO.
+     * @throws ResourceNotFoundException if no project with the given ID is found.
+     */
+    public ProjectGetDto readById(Long id) {
+        ProjectEntity entity = projectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Project with id " + id + " not found"));
+        return projectMapper.mapEntityToGetDto(entity);
     }
 
-    public ProjectGetDto updateProject(Long id, ProjectCreateDto updateDto) {
-        Optional<ProjectEntity> existingEntity = projectRepository.findById(id);
-
-        if (existingEntity.isEmpty()) {
-            throw new ResourceNotFoundException("Project with id " + id + " not found");
-        }
-
-        if (updateDto.getEmployeeIds() == null) {
-            updateDto.setEmployeeIds(new HashSet<>());
-        }
-
-        ProjectEntity entityToUpdate = projectMapper.mapCreateDtoToEntity(updateDto);
-        entityToUpdate.setId(id);
-
-        ProjectEntity savedEntity = projectRepository.save(entityToUpdate);
-
+    /**
+     * Updates an existing project.
+     *
+     * @param id        the ID of the project to update.
+     * @param updateDto DTO with the new data.
+     * @return the updated project DTO.
+     * @throws ResourceNotFoundException if the project to update is not found.
+     */
+    public ProjectGetDto update(Long id, ProjectCreateDto updateDto) {
+        ProjectEntity existingEntity = projectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Project with id " + id + " not found"));
+        ProjectEntity updatedEntity = projectMapper.mapUpdateDtoToEntity(existingEntity, updateDto);
+        ProjectEntity savedEntity = projectRepository.save(updatedEntity);
         return projectMapper.mapEntityToGetDto(savedEntity);
     }
 
-    public void deleteProject(Long id) {
+    /**
+     * Deletes a project by its ID.
+     *
+     * @param id the ID of the project to delete.
+     * @throws ResourceNotFoundException if the project to delete is not found.
+     */
+    public void delete(Long id) {
         if (!projectRepository.existsById(id)) {
             throw new ResourceNotFoundException("Project with id " + id + " not found");
         }
-
         projectRepository.deleteById(id);
     }
 }

@@ -1,79 +1,98 @@
-@token = eysJhbGciOiJSUzI1NiIsImtpZCI6IjgyYzg5YjIxNTA4YjMwODQ1NDQyNGRiOGYyMDU1ODI3IiwidHlwIjoiSldUIn0.eyJpc3MiOiJodHRwczovL2F1dGhlbnRpay5zenV0LmRldi9hcHBsaWNhdGlvbi9vL2hpdGVjLyIsInN1YiI6IjhhYjRkZTBiNmJhZGQ2ZGVhNTM1M2Y3YzExNWVmN2FiZGMyMmEzYmQyZTNmZjRjMmU5NDYzN2JlY2I2OGUzMGEiLCJhdWQiOiJoaXRlY19hcGlfY2xpZW50IiwiZXhwIjoxNzYwNzA0MjQwLCJpYXQiOjE3NjA2OTcwNDAsImF1dGhfdGltZSI6MTc2MDY5NzA0MCwiYWNyIjoiZ29hdXRoZW50aWsuaW8vcHJvdmlkZXJzL29hdXRoMi9kZWZhdWx0IiwiYXpwIjoiaGl0ZWNfYXBpX2NsaWVudCIsInVpZCI6InpiRGo0dHpERmVuWnR6MVRqUXZnTnZRck9VRW1PN0ZiMzhuU3F6QUsifQ.MRJYrR76Dt-7f3cOpBgPnnGFSUz1xw3noRhm7Yl-p7Z9XG8cTz0F8v5tvTWlvbCgSDnl47nnwqgi48HxeyyZCcjpRgp-xm1Uo5fcFsrYOwjTSLPbsY8RzFHGoCtDlUBEk_hxNFKSNa7dD4SgdtZ9jsLLcrez8n_GjToS6AkVe5MgVzPgQWYBIDNqbg1AO0VLgPGDoBkXM-AGqsCxVZQASWpaLlEyvzWqXhBb_h3IlfnOS67yzu5CHXlEQqt4UwIkf4aFAQgZWz6rHs3pUsRW5_ACpw1DHQL_g7UlAsUFFrG2AHaA5-NS2272V1sAuc5k5zggSjSXMmo4nrrjw5XopB9m7fEuClYbbnNapaJJgp4rZMbWunpbY9DaZRNa2FOx5C6-5hqhi65xAUQtTwXtNvEBva4cSzf37tqPQDYv7GXaErHl2BE155vO7-ueDWrsrXcojIlf1N_Js4dIY_r7nytqvKOAKGmQVRzy0uFIf2YQvGXenKHw_NJBo-R-lJuMyR20Fi6XOBcXmz4Rma1oCZoSO8lJEhYZ7m4znHvUgRdwYgC-oTEYi4Hdfvokjrrug651TLAhp85vb1LibXco_AbuTrypWn5toWerUHJ2g25OwsAFYFV4HUp0CUfr_oMFCiQWYoWp531efp-NvL0ERKxM_nZszsjkV6kEWF1vpVk
+Authorization: Bearer {{bearerToken}}
+
 ###
 GET localhost:8080/welcome
 
 ###
 GET localhost:8080/roles
-Authorization: Bearer {{token}}
+Authorization: Bearer {{bearerToken}}
 
 ###
 GET localhost:8080/hello
-Authorization: Bearer {{token}}
+Authorization: Bearer {{bearerToken}}
 
 ###
 POST localhost:8080/hello
-Authorization: Bearer {{token}}
+Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 
 {
-    "message": "test"
+  "message": "test"
 }
-
 
 ###
 GET https://employee-api.szut.dev/qualifications
-Authorization: Bearer {{token}}
+Authorization: Bearer {{bearerToken}}
 
 ###
 GET https://employee-api.szut.dev/employees
-Authorization: Bearer {{token}}
+Authorization: Bearer {{bearerToken}}
 
-### PROJECT API TESTS ###
-
-### 1. Create a new project
-POST localhost:8080/projects
+###
+POST http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 
 {
-    "name": "Test Project 1",
-    "description": "Dies ist ein Test-Projekt",
-    "customerId": 1,
-    "responsibleEmployeeId": 1,
-    "startDate": "2025-02-01",
-    "endDate": "2025-05-31",
-    "status": "PLANNED",
-    "employeeIds": [1, 2]
+  "name": "LF8-Projekt: Webservice Implementierung",
+  "description": "Backend für die neue Projektverwaltungssoftware als Microservice.",
+  "customerId": 101,
+  "responsibleEmployeeId": 1,
+  "startDate": "2025-10-01",
+  "endDate": "2025-12-15",
+  "status": "PLANNED",
+  "employeeIds": [
+    1,
+    2
+  ]
 }
 
-### 2. Get all projects
-GET localhost:8080/projects
+> {%
+    client.global.set("projectId", response.body.id);
+%}
 
-### 3. Get project by ID (use ID from create response)
-GET localhost:8080/projects/1
+###
+GET http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
 
-### 4. Update a project
-PUT localhost:8080/projects/1
+###
+GET http://localhost:8080/projects/{{projectId}}
+Authorization: Bearer {{bearerToken}}
+
+###
+PUT http://localhost:8080/projects/{{projectId}}
+Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 
 {
-    "name": "Updated Test Project",
-    "description": "Aktualisierte Beschreibung",
-    "customerId": 1,
-    "responsibleEmployeeId": 2,
-    "startDate": "2025-02-15",
-    "endDate": "2025-06-30",
-    "status": "RUNNING",
-    "employeeIds": [1, 2, 3]
+  "name": "LF8-Projekt: Webservice Implementierung (Update)",
+  "description": "Backend ist in der Umsetzung. Status wurde geändert.",
+  "customerId": 101,
+  "responsibleEmployeeId": 2,
+  "startDate": "2025-10-01",
+  "endDate": "2025-12-20",
+  "status": "RUNNING",
+  "employeeIds": [
+    1,
+    2,
+    3
+  ]
 }
 
-### 5. Create another project for testing
-POST localhost:8080/projects
+###
+POST http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 
 {
-    "name": "Minimal Project",
-    "responsibleEmployeeId": 1
+  "name": "Projekt zum Löschen",
+  "responsibleEmployeeId": 1
 }
 
-### 6. Delete a project
-DELETE localhost:8080/projects/2
+> {%
+    client.global.set("projectIdToDelete", response.body.id);
+%}
+
+###
+DELETE http://localhost:8080/projects/{{projectIdToDelete}}
+Authorization: Bearer {{bearerToken}}

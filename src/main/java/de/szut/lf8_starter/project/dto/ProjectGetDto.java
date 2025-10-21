@@ -6,6 +6,10 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.util.Set;
 
+/**
+ * DTO for retrieving project data.
+ * This object is sent to the client when project information is requested.
+ */
 @Data
 public class ProjectGetDto {
 
