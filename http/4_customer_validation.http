@@ -1,0 +1,23 @@
+@bearerToken = {{bearerToken}}
+
+### 1. Lege ein Projekt MIT einer customerId an
+POST http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Projekt mit Kunden-ID",
+  "description": "Test für die Dummy-Validierung.",
+  "responsibleEmployeeId": 1,
+  "customerId": 777
+}
+
+### 2. Lege ein Projekt OHNE eine customerId an
+POST http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Projekt ohne Kunden-ID",
+  "responsibleEmployeeId": 1
+}

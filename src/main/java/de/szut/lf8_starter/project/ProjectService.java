@@ -42,6 +42,8 @@ public class ProjectService {
             createDto.getEmployeeIds().forEach(employeeId -> validateEmployeeExists(employeeId, bearerToken));
         }
 
+        validateCustomerExists(createDto.getCustomerId());
+
         ProjectEntity newEntity = projectMapper.mapCreateDtoToEntity(createDto);
         ProjectEntity savedEntity = projectRepository.save(newEntity);
         return projectMapper.mapEntityToGetDto(savedEntity);
@@ -81,10 +83,14 @@ public class ProjectService {
      * @return the updated project DTO.
      */
     public ProjectGetDto update(Long id, ProjectCreateDto updateDto, String bearerToken) {
-        validateEmployeeExists(updateDto.getResponsibleEmployeeId(), bearerToken);
+        if (updateDto.getResponsibleEmployeeId() != null) {
+            validateEmployeeExists(updateDto.getResponsibleEmployeeId(), bearerToken);
+        }
         if (updateDto.getEmployeeIds() != null) {
             updateDto.getEmployeeIds().forEach(employeeId -> validateEmployeeExists(employeeId, bearerToken));
         }
+
+        validateCustomerExists(updateDto.getCustomerId());
 
         ProjectEntity existingEntity = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project with id " + id + " not found"));
@@ -212,5 +218,18 @@ public class ProjectService {
         return projects.stream()
                 .map(projectMapper::mapEntityToGetDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * DUMMY METHOD: Validates if a customer with the given ID exists.
+     * This is a placeholder for a future call to the customer service.
+     *
+     * @param customerId The ID of the customer to validate.
+     */
+    private void validateCustomerExists(Long customerId) {
+        if (customerId == null) {
+            return;
+        }
+        System.out.println("--> Skipping customer validation (dummy method) for customerId: " + customerId);
     }
 }
