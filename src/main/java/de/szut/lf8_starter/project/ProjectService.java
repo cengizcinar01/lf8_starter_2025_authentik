@@ -174,4 +174,22 @@ public class ProjectService {
             throw e;
         }
     }
+
+    /**
+     * Removes an employee from a project.
+     *
+     * @param projectId  the ID of the project.
+     * @param employeeId the ID of the employee to remove.
+     */
+    public void removeEmployeeFromProject(Long projectId, Long employeeId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
+
+        boolean removed = project.getEmployeeIds().remove(employeeId);
+
+        if (!removed) {
+            throw new ResourceNotFoundException("Employee with ID " + employeeId + " is not assigned to project with ID " + projectId + ".");
+        }
+        projectRepository.save(project);
+    }
 }

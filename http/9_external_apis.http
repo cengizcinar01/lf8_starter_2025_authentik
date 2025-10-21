@@ -1,0 +1,13 @@
+@bearerToken = {{bearerToken}}
+
+### Alle Mitarbeiter abrufen
+GET https://employee-api.szut.dev/employees
+Authorization: Bearer {{bearerToken}}
+
+### Mitarbeiter mit ID 1 abrufen
+GET https://employee-api.szut.dev/employees/1
+Authorization: Bearer {{bearerToken}}
+
+### Alle Qualifikationen abrufen
+GET https://employee-api.szut.dev/qualifications
+Authorization: Bearer {{bearerToken}}

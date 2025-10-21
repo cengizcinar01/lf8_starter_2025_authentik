@@ -1,0 +1,55 @@
+@bearerToken = {{bearerToken}}
+
+### 1. Lege ein neues Projekt an (wird ID 1 bekommen, wenn die DB leer ist)
+POST http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Projekt Alpha",
+  "description": "Das erste Test-Projekt.",
+  "responsibleEmployeeId": 1,
+  "startDate": "2025-11-01",
+  "endDate": "2025-11-30",
+  "employeeIds": [
+    1,
+    2
+  ]
+}
+
+### 2. Rufe alle Projekte ab
+GET http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
+
+### 3. Rufe Projekt mit ID 1 ab
+GET http://localhost:8080/projects/1
+Authorization: Bearer {{bearerToken}}
+
+### 4. Aktualisiere Projekt mit ID 1
+PUT http://localhost:8080/projects/1
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Haupt-Testprojekt (AKTUALISIERT)",
+  "description": "Die Beschreibung wurde geändert.",
+  "responsibleEmployeeId": 2,
+  "status": "RUNNING",
+  "startDate": "2025-11-01",
+  "endDate": "2025-11-30",
+  "employeeIds": [1, 2]
+}
+
+### 5. Lege ein zweites Projekt an (wird ID 2)
+POST http://localhost:8080/projects
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Projekt Beta",
+  "responsibleEmployeeId": 3
+}
+
+### 6. Lösche Projekt mit ID 2
+DELETE http://localhost:8080/projects/2
+Authorization: Bearer {{bearerToken}}
