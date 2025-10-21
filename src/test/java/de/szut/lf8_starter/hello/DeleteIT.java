@@ -1,17 +1,19 @@
 package de.szut.lf8_starter.hello;
 
+import de.szut.lf8_starter.config.TestSecurityConfiguration;
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.springframework.security.test.context.support.WithMockUser;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
+@Import(TestSecurityConfiguration.class)
 public class DeleteIT extends AbstractIntegrationTest {
 
 
@@ -39,7 +41,7 @@ public class DeleteIT extends AbstractIntegrationTest {
     @WithMockUser(roles = "user")
     void idDoesNotExist() throws Exception {
         final var contentAsString = this.mockMvc.perform(delete("/hello/5")
-                .with(csrf()))
+                        .with(csrf()))
                 .andExpect(content().string(containsString("HelloEntity not found on id = 5")))
                 .andExpect(status().isNotFound());
     }

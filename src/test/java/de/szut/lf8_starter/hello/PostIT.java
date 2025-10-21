@@ -1,19 +1,21 @@
 package de.szut.lf8_starter.hello;
 
+import de.szut.lf8_starter.config.TestSecurityConfiguration;
 import de.szut.lf8_starter.testcontainers.AbstractIntegrationTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Import(TestSecurityConfiguration.class)
 public class PostIT extends AbstractIntegrationTest {
 
 
@@ -42,8 +44,8 @@ public class PostIT extends AbstractIntegrationTest {
 
         final var contentAsString = this.mockMvc.perform(post("/hello").content(content).contentType(MediaType.APPLICATION_JSON)
 
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful())
+                        .with(csrf()))
+                .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("message", is("Foo")))
                 .andReturn()

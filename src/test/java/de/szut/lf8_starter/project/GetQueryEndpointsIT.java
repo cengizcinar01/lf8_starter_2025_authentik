@@ -62,7 +62,7 @@ public class GetQueryEndpointsIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/projects/employees/{employeeId}/projects", employeeIdToFind)
                         .with(csrf()).with(jwt()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2))) // Sollte Projekt A und C finden
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name").value(is("Projekt A")))
                 .andExpect(jsonPath("$[1].name").value(is("Projekt C")));
     }
