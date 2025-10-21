@@ -1,0 +1,18 @@
+@bearerToken = {{bearerToken}}
+
+### 1. Rufe alle Mitarbeiter von Projekt mit ID 1 ab
+# Erwartet: Eine Liste mit den Mitarbeiter-IDs [1, 2] (aus dem Setup in 1_projects.http)
+GET http://localhost:8080/projects/1/employees
+Authorization: Bearer {{bearerToken}}
+
+
+### 2. Rufe alle Projekte von Mitarbeiter 1 ab
+# Erwartet: Eine Liste, die mindestens "Projekt Alpha" enthält.
+GET http://localhost:8080/projects/employees/1/projects
+Authorization: Bearer {{bearerToken}}
+
+
+### 3. Rufe alle Projekte von Mitarbeiter 3 ab
+# Erwartet: Eine leere Liste [], da Mitarbeiter 3 initial keinem Projekt zugewiesen wurde.
+GET http://localhost:8080/projects/employees/3/projects
+Authorization: Bearer {{bearerToken}}

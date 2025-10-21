@@ -197,12 +197,20 @@ public class ProjectService {
     public GetEmployeesOfProjectDto getEmployeesOfProject(Long projectId) {
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
-        
+
         GetEmployeesOfProjectDto dto = new GetEmployeesOfProjectDto();
         dto.setProjectId(project.getId());
         dto.setProjectName(project.getName());
         dto.setEmployeeIds(project.getEmployeeIds());
 
         return dto;
+    }
+
+    public List<ProjectGetDto> getProjectsOfEmployee(Long employeeId) {
+        List<ProjectEntity> projects = projectRepository.findByEmployeeIdsContaining(employeeId);
+
+        return projects.stream()
+                .map(projectMapper::mapEntityToGetDto)
+                .collect(Collectors.toList());
     }
 }

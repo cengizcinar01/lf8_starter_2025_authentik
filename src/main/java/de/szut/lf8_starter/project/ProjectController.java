@@ -86,4 +86,10 @@ public class ProjectController implements ProjectControllerOpenAPI {
         GetEmployeesOfProjectDto employeesDto = projectService.getEmployeesOfProject(projectId);
         return ResponseEntity.ok(employeesDto);
     }
+
+    @GetMapping(path = "/employees/{employeeId}/projects")
+    public ResponseEntity<List<ProjectGetDto>> getProjectsOfEmployee(@PathVariable Long employeeId) {
+        List<ProjectGetDto> projects = projectService.getProjectsOfEmployee(employeeId);
+        return ResponseEntity.ok(projects);
+    }
 }

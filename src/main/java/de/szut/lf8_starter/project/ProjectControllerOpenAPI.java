@@ -98,4 +98,11 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "Project not found")
     })
     ResponseEntity<GetEmployeesOfProjectDto> getEmployeesOfProject(@PathVariable Long projectId);
+
+    @Operation(summary = "Gets all projects for a specific employee.", description = "Retrieves a list of all projects a specific employee is assigned to.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Project list retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Not authorized")
+    })
+    ResponseEntity<List<ProjectGetDto>> getProjectsOfEmployee(@PathVariable Long employeeId);
 }
