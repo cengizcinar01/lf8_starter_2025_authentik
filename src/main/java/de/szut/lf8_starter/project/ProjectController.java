@@ -23,9 +23,16 @@ public class ProjectController implements ProjectControllerOpenAPI {
 
     @Override
     @PostMapping
-    public ResponseEntity<ProjectGetDto> createProject(@Valid @RequestBody ProjectCreateDto createDto) {
-        ProjectGetDto createdProject = projectService.create(createDto);
+    public ResponseEntity<ProjectGetDto> createProject(
+            @Valid @RequestBody ProjectCreateDto createDto,
+            @RequestHeader("Authorization") String bearerToken) {
+        ProjectGetDto createdProject = projectService.create(createDto, bearerToken);
         return new ResponseEntity<>(createdProject, HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<ProjectGetDto> createProject(ProjectCreateDto createDto) {
+        return null;
     }
 
     @Override
@@ -43,9 +50,18 @@ public class ProjectController implements ProjectControllerOpenAPI {
     }
 
     @Override
+    public ResponseEntity<ProjectGetDto> updateProject(Long id, ProjectCreateDto updateDto) {
+        return null;
+    }
+
+    @Override
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectGetDto> updateProject(@PathVariable Long id, @Valid @RequestBody ProjectCreateDto updateDto) {
-        ProjectGetDto updatedProject = projectService.update(id, updateDto);
+    public ResponseEntity<ProjectGetDto> updateProject(
+            @PathVariable Long id,
+            @Valid @RequestBody ProjectCreateDto updateDto,
+            @RequestHeader("Authorization") String bearerToken) {
+
+        ProjectGetDto updatedProject = projectService.update(id, updateDto, bearerToken);
         return ResponseEntity.ok(updatedProject);
     }
 

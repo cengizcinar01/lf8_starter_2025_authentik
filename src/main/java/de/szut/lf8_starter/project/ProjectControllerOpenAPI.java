@@ -10,9 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,6 +19,11 @@ import java.util.List;
  * This interface defines all endpoints related to projects, including their documentation.
  */
 public interface ProjectControllerOpenAPI {
+
+    @PostMapping
+    ResponseEntity<ProjectGetDto> createProject(
+            @Valid @RequestBody ProjectCreateDto createDto,
+            @RequestHeader("Authorization") String bearerToken);
 
     @Operation(summary = "Creates a new project")
     @ApiResponses(value = {
@@ -54,6 +57,12 @@ public interface ProjectControllerOpenAPI {
             @ApiResponse(responseCode = "404", description = "Project or a specified employee not found")
     })
     ResponseEntity<ProjectGetDto> updateProject(@PathVariable Long id, @Valid @RequestBody ProjectCreateDto updateDto);
+
+    @PutMapping("/{id}")
+    ResponseEntity<ProjectGetDto> updateProject(
+            @PathVariable Long id,
+            @Valid @RequestBody ProjectCreateDto updateDto,
+            @RequestHeader("Authorization") String bearerToken);
 
     @Operation(summary = "Deletes a project by its ID")
     @ApiResponses(value = {
