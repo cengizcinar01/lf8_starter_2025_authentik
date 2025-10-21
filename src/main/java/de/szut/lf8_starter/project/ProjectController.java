@@ -14,7 +14,8 @@ import java.util.List;
 
 /**
  * Controller for handling project-related HTTP requests.
- * Implements the OpenAPI definition from ProjectControllerOpenAPI.
+ * Implements the OpenAPI definition from {@link ProjectControllerOpenAPI}.
+ * This class delegates all business logic to the {@link ProjectService}.
  */
 @RestController
 @RequestMapping("/projects")

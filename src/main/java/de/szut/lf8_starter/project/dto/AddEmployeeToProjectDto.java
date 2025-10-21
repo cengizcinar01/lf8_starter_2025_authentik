@@ -4,7 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * DTO for adding an employee to a project.
+ * Data Transfer Object for adding a single employee to a project.
+ * Used as the request body for POST /projects/{projectId}/employees.
  */
 @Data
 public class AddEmployeeToProjectDto {

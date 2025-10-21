@@ -17,9 +17,11 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Service class for handling project-related business logic.
+ * Service class for handling all project-related business logic.
+ * This includes CRUD operations, validation, and interaction with external services.
  */
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class ProjectService {
     private final RestTemplate restTemplate;
 
     /**
-     * Creates a new project after validating the provided data.
+     * Creates a new project after validating all provided data.
      *
      * @param createDto   DTO containing the project data.
      * @param bearerToken the authorization token for external validation.
@@ -41,7 +43,6 @@ public class ProjectService {
         if (createDto.getEmployeeIds() != null) {
             createDto.getEmployeeIds().forEach(employeeId -> validateEmployeeExists(employeeId, bearerToken));
         }
-
         validateCustomerExists(createDto.getCustomerId());
 
         ProjectEntity newEntity = projectMapper.mapCreateDtoToEntity(createDto);
@@ -50,7 +51,7 @@ public class ProjectService {
     }
 
     /**
-     * Retrieves all projects.
+     * Retrieves a list of all projects.
      *
      * @return a list of all projects.
      */
@@ -62,11 +63,10 @@ public class ProjectService {
     }
 
     /**
-     * Retrieves a single project by its ID.
+     * Retrieves a single project by its unique ID.
      *
      * @param id the ID of the project.
      * @return the project DTO.
-     * @throws ResourceNotFoundException if no project with the given ID is found.
      */
     public ProjectGetDto readById(Long id) {
         ProjectEntity entity = projectRepository.findById(id)
@@ -75,7 +75,7 @@ public class ProjectService {
     }
 
     /**
-     * Updates an existing project after validating the provided data.
+     * Updates an existing project after validating all provided data.
      *
      * @param id          the ID of the project to update.
      * @param updateDto   DTO with the new data.
@@ -89,7 +89,6 @@ public class ProjectService {
         if (updateDto.getEmployeeIds() != null) {
             updateDto.getEmployeeIds().forEach(employeeId -> validateEmployeeExists(employeeId, bearerToken));
         }
-
         validateCustomerExists(updateDto.getCustomerId());
 
         ProjectEntity existingEntity = projectRepository.findById(id)
@@ -114,7 +113,7 @@ public class ProjectService {
     }
 
     /**
-     * Adds an employee to a project after validation.
+     * Adds a single employee to a project's team after performing all necessary validations.
      *
      * @param projectId   the ID of the project.
      * @param employeeId  the ID of the employee to add.
@@ -126,7 +125,7 @@ public class ProjectService {
                 .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
 
         validateEmployeeExists(employeeId, bearerToken);
-        checkEmployeeAvailability(employeeId, project.getStartDate(), project.getEndDate());
+        checkEmployeeAvailability(employeeId, project.getStartDate(), project.getEndDate(), projectId);
 
         if (project.getEmployeeIds().contains(employeeId)) {
             return projectMapper.mapEntityToGetDto(project);
@@ -138,28 +137,86 @@ public class ProjectService {
     }
 
     /**
-     * Checks if an employee is already scheduled during a given timeframe.
-     * Throws an EmployeeNotAvailableException if a conflict is found.
+     * Removes a single employee from a project's team.
+     *
+     * @param projectId  the ID of the project.
+     * @param employeeId the ID of the employee to remove.
      */
-    private void checkEmployeeAvailability(Long employeeId, LocalDate newProjectStart, LocalDate newProjectEnd) {
+    public void removeEmployeeFromProject(Long projectId, Long employeeId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
+
+        boolean removed = project.getEmployeeIds().remove(employeeId);
+
+        if (!removed) {
+            throw new ResourceNotFoundException("Employee with ID " + employeeId + " is not assigned to project with ID " + projectId + ".");
+        }
+        projectRepository.save(project);
+    }
+
+    /**
+     * Retrieves all employees assigned to a specific project.
+     *
+     * @param projectId the ID of the project.
+     * @return a DTO containing the project details and its employee IDs.
+     */
+    public GetEmployeesOfProjectDto getEmployeesOfProject(Long projectId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
+
+        GetEmployeesOfProjectDto dto = new GetEmployeesOfProjectDto();
+        dto.setProjectId(project.getId());
+        dto.setProjectName(project.getName());
+        dto.setEmployeeIds(project.getEmployeeIds());
+
+        return dto;
+    }
+
+    /**
+     * Retrieves all projects a specific employee is involved in (as responsible or team member).
+     *
+     * @param employeeId the ID of the employee.
+     * @return a list of project DTOs.
+     */
+    public List<ProjectGetDto> getProjectsOfEmployee(Long employeeId) {
+        List<ProjectEntity> projectsAsResponsible = projectRepository.findByResponsibleEmployeeId(employeeId);
+        List<ProjectEntity> projectsAsTeamMember = projectRepository.findByEmployeeIdsContaining(employeeId);
+
+        return Stream.concat(projectsAsResponsible.stream(), projectsAsTeamMember.stream())
+                .distinct()
+                .map(projectMapper::mapEntityToGetDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Checks if an employee is already scheduled for another project during the given timeframe.
+     * Throws an EmployeeNotAvailableException if a scheduling conflict is found.
+     */
+    private void checkEmployeeAvailability(Long employeeId, LocalDate newProjectStart, LocalDate newProjectEnd, Long currentProjectId) {
         if (newProjectStart == null || newProjectEnd == null) {
             return;
         }
 
-        List<ProjectEntity> projectsOfEmployee = projectRepository.findByEmployeeIdsContaining(employeeId);
+        List<ProjectEntity> projectsAsResponsible = projectRepository.findByResponsibleEmployeeId(employeeId);
+        List<ProjectEntity> projectsAsTeamMember = projectRepository.findByEmployeeIdsContaining(employeeId);
 
-        for (ProjectEntity existingProject : projectsOfEmployee) {
-            if (existingProject.getStartDate() == null || existingProject.getEndDate() == null) {
-                continue;
-            }
+        Stream.concat(projectsAsResponsible.stream(), projectsAsTeamMember.stream())
+                .distinct()
+                .forEach(existingProject -> {
+                    if (existingProject.getId().equals(currentProjectId)) {
+                        return;
+                    }
+                    if (existingProject.getStartDate() == null || existingProject.getEndDate() == null) {
+                        return;
+                    }
 
-            boolean overlaps = !newProjectStart.isAfter(existingProject.getEndDate()) &&
-                    !newProjectEnd.isBefore(existingProject.getStartDate());
+                    boolean overlaps = !newProjectStart.isAfter(existingProject.getEndDate()) &&
+                            !newProjectEnd.isBefore(existingProject.getStartDate());
 
-            if (overlaps) {
-                throw new EmployeeNotAvailableException("Employee with ID " + employeeId + " is already scheduled in project '" + existingProject.getName() + "' during this timeframe.");
-            }
-        }
+                    if (overlaps) {
+                        throw new EmployeeNotAvailableException("Employee with ID " + employeeId + " is already scheduled in project '" + existingProject.getName() + "' during this timeframe.");
+                    }
+                });
     }
 
     /**
@@ -183,48 +240,7 @@ public class ProjectService {
     }
 
     /**
-     * Removes an employee from a project.
-     *
-     * @param projectId  the ID of the project.
-     * @param employeeId the ID of the employee to remove.
-     */
-    public void removeEmployeeFromProject(Long projectId, Long employeeId) {
-        ProjectEntity project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
-
-        boolean removed = project.getEmployeeIds().remove(employeeId);
-
-        if (!removed) {
-            throw new ResourceNotFoundException("Employee with ID " + employeeId + " is not assigned to project with ID " + projectId + ".");
-        }
-        projectRepository.save(project);
-    }
-
-    public GetEmployeesOfProjectDto getEmployeesOfProject(Long projectId) {
-        ProjectEntity project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project with ID " + projectId + " not found."));
-
-        GetEmployeesOfProjectDto dto = new GetEmployeesOfProjectDto();
-        dto.setProjectId(project.getId());
-        dto.setProjectName(project.getName());
-        dto.setEmployeeIds(project.getEmployeeIds());
-
-        return dto;
-    }
-
-    public List<ProjectGetDto> getProjectsOfEmployee(Long employeeId) {
-        List<ProjectEntity> projects = projectRepository.findByEmployeeIdsContaining(employeeId);
-
-        return projects.stream()
-                .map(projectMapper::mapEntityToGetDto)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * DUMMY METHOD: Validates if a customer with the given ID exists.
-     * This is a placeholder for a future call to the customer service.
-     *
-     * @param customerId The ID of the customer to validate.
      */
     private void validateCustomerExists(Long customerId) {
         if (customerId == null) {
