@@ -1,10 +1,8 @@
 package de.szut.lf8_starter.exceptionHandling;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -12,17 +10,38 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Date;
 
 @ControllerAdvice
-@ApiResponses(value = {
-        @ApiResponse(responseCode = "500", description = "invalid JSON posted",
-                content = @Content)
-})
 public class GlobalExceptionHandler {
 
+    /**
+     * Handles exceptions when a requested resource is not found.
+     * Returns a 404 Not Found status.
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleHelloEntityNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handles exceptions from @Valid annotation failures.
+     * Extracts the user-friendly message from the validation annotation.
+     * Returns a 400 Bad Request status.
+     * (Dies ist die exakte Logik aus dem 'store'-Projekt)
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorDetails> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+        String errorMessage = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), errorMessage, request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
 
+    /**
+     * A catch-all handler for any other unhandled exceptions.
+     * Returns a 500 Internal Server Error status.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorDetails> handleAllOtherExceptions(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), "An unexpected error occurred", request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
