@@ -71,4 +71,11 @@ public class ProjectController implements ProjectControllerOpenAPI {
         ProjectGetDto updatedProject = projectService.addEmployeeToProject(projectId, dto.getEmployeeId(), bearerToken);
         return ResponseEntity.ok(updatedProject);
     }
+
+    @Override
+    @DeleteMapping("/{projectId}/employees/{employeeId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeEmployeeFromProject(@PathVariable Long projectId, @PathVariable Long employeeId) {
+        projectService.removeEmployeeFromProject(projectId, employeeId);
+    }
 }

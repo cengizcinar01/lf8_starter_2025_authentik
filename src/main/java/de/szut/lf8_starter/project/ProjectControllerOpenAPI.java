@@ -80,4 +80,13 @@ public interface ProjectControllerOpenAPI {
     ResponseEntity<ProjectGetDto> addEmployeeToProject(@PathVariable Long projectId,
                                                        @Valid @RequestBody AddEmployeeToProjectDto dto,
                                                        @RequestHeader("Authorization") String bearerToken);
+
+    @Operation(summary = "Removes an employee from a project team.", description = "Removes a specific employee from a specific project.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Employee removed successfully", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Not authorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Project or employee assignment not found", content = @Content)
+    })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void removeEmployeeFromProject(@PathVariable Long projectId, @PathVariable Long employeeId);
 }
