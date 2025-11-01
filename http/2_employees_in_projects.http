@@ -1,12 +1,12 @@
 @bearerToken = {{bearerToken}}
 
-### 1. Füge Mitarbeiter 3 zu Projekt 1 hinzu
+### 1. Füge Mitarbeiter 4 zu Projekt 1 hinzu
 POST http://localhost:8080/projects/1/employees
 Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 
 {
-  "employeeId": 3
+  "employeeId": 4
 }
 
 ### 2. Entferne Mitarbeiter 2 aus Projekt 1

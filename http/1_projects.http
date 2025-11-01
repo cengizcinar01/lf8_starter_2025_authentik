@@ -40,14 +40,14 @@ Content-Type: application/json
   "employeeIds": [1, 2]
 }
 
-### 5. Lege ein zweites Projekt an (wird ID 2)
+### 5. Lege ein zweites Projekt an (wird ID 4)
 POST http://localhost:8080/projects
 Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 
 {
   "name": "Projekt Beta",
-  "responsibleEmployeeId": 3
+  "responsibleEmployeeId": 4
 }
 
 ### 6. Lösche Projekt mit ID 2
