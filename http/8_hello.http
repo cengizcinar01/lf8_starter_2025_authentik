@@ -1,0 +1,35 @@
+@bearerToken = {{bearerToken}}
+
+### 1. Create a new Hello
+POST http://localhost:8080/hello
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "message": "test"
+}
+
+### 2. Get all Hellos
+GET http://localhost:8080/hello
+Authorization: Bearer {{bearerToken}}
+
+### 3. Search Hellos by message
+GET http://localhost:8080/hello/findByMessage?message=test
+Authorization: Bearer {{bearerToken}}
+
+### 4. Delete Hello by ID (replace 1 with actual ID from create response)
+DELETE http://localhost:8080/hello/6
+Authorization: Bearer {{bearerToken}}
+
+### 6. Create another Hello for testing
+POST http://localhost:8080/hello
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "message": "Another test message"
+}
+
+### 7. Get all Hellos again
+GET http://localhost:8080/hello
+Authorization: Bearer {{bearerToken}}

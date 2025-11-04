@@ -8,14 +8,16 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 import java.util.List;
 
 public interface HelloControllerOpenAPI {
 
     @Operation(summary = "creates a new hello with its id and message")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "created hello",
                     content = {@Content(mediaType = "application/json",
@@ -27,6 +29,7 @@ public interface HelloControllerOpenAPI {
     HelloGetDto create(HelloCreateDto helloCreateDto);
 
     @Operation(summary = "delivers a list of hello objects")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "list of hellos",
                     content = {@Content(mediaType = "application/json",
@@ -36,6 +39,7 @@ public interface HelloControllerOpenAPI {
     List<HelloGetDto> findAll();
 
     @Operation(summary = "deletes a Hello by id")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "delete successful"),
             @ApiResponse(responseCode = "401", description = "not authorized",
@@ -47,6 +51,7 @@ public interface HelloControllerOpenAPI {
 
 
     @Operation(summary = "find hellos by message")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of hellos who have the given message",
                     content = {@Content(mediaType = "application/json",
