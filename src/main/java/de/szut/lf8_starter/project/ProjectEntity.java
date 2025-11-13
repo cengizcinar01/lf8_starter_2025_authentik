@@ -76,9 +76,9 @@ public class ProjectEntity {
 
     /**
      * A set of employee IDs who are assigned to this project.
-     * Stored in a separate table 'project_employees' and loaded eagerly.
+     * Stored in a separate table 'project_employees' and loaded lazily for better performance.
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "project_employees", joinColumns = @JoinColumn(name = "project_id"))
     @Column(name = "employee_id")
     private Set<Long> employeeIds;

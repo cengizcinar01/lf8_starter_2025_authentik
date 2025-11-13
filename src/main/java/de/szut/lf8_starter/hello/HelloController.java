@@ -35,7 +35,7 @@ public class HelloController implements HelloControllerOpenAPI {
         return this.service
                 .readAll()
                 .stream()
-                .map(e -> this.helloMapper.mapToGetDto(e))
+                .map(this.helloMapper::mapToGetDto)
                 .collect(Collectors.toList());
     }
 
@@ -55,7 +55,7 @@ public class HelloController implements HelloControllerOpenAPI {
         return this.service
                 .findByMessage(message)
                 .stream()
-                .map(e -> this.helloMapper.mapToGetDto(e))
+                .map(this.helloMapper::mapToGetDto)
                 .collect(Collectors.toList());
     }
 }
