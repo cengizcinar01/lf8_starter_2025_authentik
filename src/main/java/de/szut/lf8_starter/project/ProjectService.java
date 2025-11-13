@@ -33,6 +33,8 @@ public class ProjectService {
 
     /**
      * Creates a new project after validating all provided data.
+     * Note: Employee validation is performed sequentially due to external API constraints.
+     * If the external API supports batch validation, this should be refactored for better performance.
      *
      * @param createDto   DTO containing the project data.
      * @param bearerToken the authorization token for external validation.
@@ -42,6 +44,7 @@ public class ProjectService {
     public ProjectGetDto create(ProjectCreateDto createDto, String bearerToken) {
         validateEmployeeExists(createDto.getResponsibleEmployeeId(), bearerToken);
         if (createDto.getEmployeeIds() != null) {
+            // Note: Sequential validation - consider batch API if available for better performance
             createDto.getEmployeeIds().forEach(employeeId -> validateEmployeeExists(employeeId, bearerToken));
         }
         validateCustomerExists(createDto.getCustomerId());
@@ -79,6 +82,8 @@ public class ProjectService {
 
     /**
      * Updates an existing project after validating all provided data.
+     * Note: Employee validation is performed sequentially due to external API constraints.
+     * If the external API supports batch validation, this should be refactored for better performance.
      *
      * @param id          the ID of the project to update.
      * @param updateDto   DTO with the new data.
@@ -91,6 +96,7 @@ public class ProjectService {
             validateEmployeeExists(updateDto.getResponsibleEmployeeId(), bearerToken);
         }
         if (updateDto.getEmployeeIds() != null) {
+            // Note: Sequential validation - consider batch API if available for better performance
             updateDto.getEmployeeIds().forEach(employeeId -> validateEmployeeExists(employeeId, bearerToken));
         }
         validateCustomerExists(updateDto.getCustomerId());
